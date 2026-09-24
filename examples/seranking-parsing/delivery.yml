@@ -42,7 +42,8 @@ repos:
       Worktrees: symlink node_modules from the main checkout and exclude the
       symlink via info/exclude. Chrome runs headful (no xvfb on macOS): windows
       appear on the human's screen, so live runs need the human's OK; reap only
-      crawler Chrome by its --user-data-dir=/tmp/lighthouse* profile.
+      crawler Chrome by its --user-data-dir=.../lighthouse.* profile — on macOS
+      it lives under $TMPDIR, not /tmp: pgrep -f 'user-data-dir=[^ ]*/lighthouse\.'
 
   lib-parsers-php:
     path: ~/work/lib-parsers-php
