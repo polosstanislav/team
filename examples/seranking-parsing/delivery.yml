@@ -1,0 +1,107 @@
+# SE Ranking crawling & parsing stack. Linear, team Core.
+# Copy to <workspace root>/.claude/delivery.yml, set project_id and repo paths.
+project:
+  name: <project name>
+  key: CORE
+  research: []                  # e.g. docs/<engine>-research.md for the planner
+
+tracker:
+  type: linear
+  linear:
+    team_id: 35ad04af-e298-4655-862f-44d6d28f66d3     # Core
+    project_id: ""                                    # the Linear project for this run
+    states:
+      backlog: 531cfdca-0cb0-402e-9bab-2296827fcf04
+      todo: 730f7975-bdb3-49a9-87f1-4d2e80dd9420
+      development: 0d2dda2a-5e63-4788-94e2-4a88f837a006
+      code_review: ace0af99-a1d4-4b06-af1c-9ec2f0e05758
+      testing: 78c3cb64-f8f3-455c-89bd-7d60d416a538
+      done: bcd5c93d-86ea-44c9-a014-fde5ff7c1396
+
+git:
+  branch:                       # Gitflow convention; not ai/ or claude/
+    feature: "ft/{ticket}-{slug}"
+    fix: "fix/{ticket}-{slug}"
+  worktree: "../{repo}-{ticket}"
+  commit_trailer: ""
+  pr_title: "{ticket} {title}"
+
+repos:
+  unified-headless-crawler:
+    path: ~/work/unified-headless-crawler
+    role: crawler-engineer
+    base: master                # no develop branch
+    verify:
+      - npm run build
+      - npx eslint "src/**/*.ts"
+      - npm test
+    notes: >-
+      Read AGENTS.md. Repo skills: local-crawler-config (local config from the
+      real helm values, push test tasks, bounded workers) and open-engine-page
+      (probe a live engine page) — use them instead of hand-built configs.
+      Worktrees: symlink node_modules from the main checkout and exclude the
+      symlink via info/exclude. Chrome runs headful (no xvfb on macOS): windows
+      appear on the human's screen, so live runs need the human's OK; reap only
+      crawler Chrome by its --user-data-dir=/tmp/lighthouse* profile.
+
+  lib-parsers-php:
+    path: ~/work/lib-parsers-php
+    role: parser-engineer
+    base: main
+    verify:
+      - composer test
+      - composer psalm
+      - composer cs
+    notes: >-
+      Released as a versioned composer package (tags v*); consumers need a new
+      release before they compile against changes. Fixtures live under
+      tests/_data/<engine>/<year>/<date>-<name>.html.
+
+  crawling-and-parsing-api:
+    path: ~/work/crawling-and-parsing-api
+    role: parser-engineer
+    base: main                  # origin/HEAD; no develop
+    verify:
+      - vendor/bin/phpunit
+      - vendor/bin/phpstan analyze --memory-limit=512M
+      - composer cs-check
+    notes: >-
+      Read AGENTS.md. Its internal API is published as a generated, versioned
+      SDK package: an ingest route must ship and release before a worker can
+      compile against it.
+
+  internal-parsing-worker:
+    path: ~/work/internal-parsing-worker
+    role: parser-engineer
+    base: master                # origin/HEAD; no develop
+    verify:
+      - composer test
+      - composer phpstan
+      - composer cs-check
+    notes: >-
+      Read AGENTS.md. Depends on the generated API SDK and on lib-parsers-php
+      releases.
+
+  se-ranking-app:
+    path: ~/work/se-ranking-app
+    role: parser-engineer
+    base: develop               # develop exists → feature PRs target it (Gitflow)
+    verify:
+      - composer test
+      - composer psalm
+      - composer cs
+    notes: >-
+      Read AGENTS.md and CLAUDE.md (PSR-12, comments only for complex business
+      logic).
+
+safety:
+  read_only:
+    - production task and result queues
+    - production databases
+    - the infrastructure / deployment repo (helm, ansible)
+    - production fingerprint pools, except the read access local runs already use
+  writable:
+    - the local dev Redis instance configured by the crawler's local-crawler-config skill
+  forbidden:
+    - long-lived crawler workers left running
+    - using credentials found in remote URLs, configs or logs for anything else

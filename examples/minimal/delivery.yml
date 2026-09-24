@@ -1,0 +1,37 @@
+# Minimal project: local folder board, one repo.
+# Copy to <project root>/.claude/delivery.yml and edit.
+project:
+  name: My service
+  key: TEAM
+
+tracker:
+  type: local
+  local:
+    board: .board
+
+git:
+  branch:
+    feature: "ft/{ticket}-{slug}"
+    fix: "fix/{ticket}-{slug}"
+  worktree: "../{repo}-{ticket}"
+  commit_trailer: ""            # empty = your harness's attribution line
+  pr_title: "{ticket} {title}"
+
+repos:
+  app:
+    path: .                     # the project root is the repo
+    role: parser-engineer
+    base: main
+    verify:
+      - npm ci
+      - npm test
+    notes: >-
+      Read AGENTS.md before editing.
+
+safety:
+  read_only:
+    - production databases and third-party APIs with real side effects
+  writable:
+    - the local test database
+  forbidden:
+    - long-lived processes left running

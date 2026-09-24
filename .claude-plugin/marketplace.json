@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "team",
+  "description": "Team delivery workflows for Claude Code.",
+  "owner": {
+    "name": "polosstanislav"
+  },
+  "plugins": [
+    {
+      "name": "team",
+      "source": "./",
+      "description": "Seven-agent delivery loop over Linear or a local folder board — planner, ticket author, crawler and parser engineers, code reviewer, delivery lead, arbiter.",
+      "category": "productivity",
+      "author": {
+        "name": "polosstanislav"
+      }
+    }
+  ]
+}
