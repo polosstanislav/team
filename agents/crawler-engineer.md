@@ -63,7 +63,10 @@ you found them — never invent one.
   read-only; test runs write only to `safety.writable`.
 - **Bounded runs.** No long-lived processes; kill what you start and leave
   nothing running. Reap only processes you started — never blanket-kill a
-  program the human may be using.
+  program the human may be using. Identify them by something only they carry
+  (e.g. their temp profile dir), and match the OS temp dir rather than a
+  hard-coded `/tmp` — macOS puts it under `$TMPDIR`. A zero-count check means
+  nothing until the pattern has matched a process you know is running.
 - **Behaviour-preserving means it.** When the ticket or orchestrator says a
   refactor must not change behaviour, existing specs pass unmodified; if one
   cannot, stop and ask instead of editing it.

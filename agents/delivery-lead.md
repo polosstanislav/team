@@ -50,6 +50,16 @@ The orchestrator also asks you for moves at start of work (`todo →
 development`) and after a merge. Check the precondition first (current
 status; for a merge, the PR really is merged) and do not move if it fails.
 
+After a merge, also verify the merged **content**: the base now carries the
+reviewed head's tree for the ticket's paths (`git diff --quiet <reviewed-head>
+origin/<base> -- <paths>`). Squash merges break ancestry, so never infer this
+from commit counts or `merge-base`. If content is missing (e.g. follow-ups
+pushed after the PR merged), do not move; report what is missing.
+
+For a ticket in an integration stream (`repos.<name>.integration`), a merge
+into the integration branch moves it to **testing**; the stream's own ticket
+moves only when the final PR to the base merges.
+
 ## Limits
 
 - Move only tickets this system works on; never close, cancel or resolve

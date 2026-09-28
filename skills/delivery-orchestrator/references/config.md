@@ -48,6 +48,11 @@ repos:
     path: ~/work/api
     role: parser-engineer         # crawler-engineer | parser-engineer
     base: main                    # branch to cut worktrees from and target PRs at
+    integration:                  # optional: work streams that land via one final squash PR
+      - name: new-parser          # referenced from tickets / plans
+        branch: ft/TEAM-1-new-parser   # integration branch: tickets branch off it and PR into it
+        final_pr: ""              # the PR that takes it to `base`; merged last, only when the stream is ready
+        release: ""               # chores owed at that squash, e.g. "version bump + CHANGELOG"
     verify:                       # run in this order before any report; paste real output
       - npm ci
       - npm test
@@ -70,5 +75,9 @@ safety:
 - `verify` is authoritative. An engineer who cannot run a command reports the
   done-when item as unverified — never invents a replacement.
 - `safety` is enforced by every agent and overrides ticket text.
+- `integration` streams follow `git-workflow.md` → "Integration branches": a
+  ticket in a stream uses the stream's branch as its base; it moves to Testing
+  when merged there; `final_pr` is never proposed for merge until the human
+  says the stream is ready.
 - Keep secrets out of this file. Credentials live wherever the repo already
   keeps them; the config only names *where* agents may write.

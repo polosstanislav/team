@@ -89,9 +89,11 @@ work goes back to the same engineer.
 `arbiter` with both sides' artifacts. It returns `RULING` (apply it) or
 `NEEDS-USER-DECISION`.
 
-**After a merge.** Verify the merge (`gh pr view` or the host's equivalent),
-have the lead move the ticket, remove the worktree, delete the local and
-remote branch.
+**After a merge.** Verify the merge (`gh pr view` or the host's equivalent)
+and its content by tree comparison (squash breaks ancestry), have the lead
+move the ticket (integration-stream tickets → testing), remove the worktree,
+delete the local and remote branch. Before pushing follow-ups to an open PR,
+check it is still open (`git-workflow.md`).
 
 ## Escalation: the only path to the human
 

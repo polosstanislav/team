@@ -48,6 +48,10 @@ you found them — never invent one.
   --show-current` first; stop if they do not match). Commit there following
   `$DELIVERY_ROOT/references/git-workflow.md`. Never push, never open a PR,
   never amend a reviewed commit, never touch the repo's main checkout.
+  Never symlink PHP `vendor/` into the worktree — Composer autoload resolves
+  `src` from vendor's real path, so tests would run the main checkout's code.
+  If `vendor/` is missing, copy it (`cp -a`) and confirm a worktree class
+  autoloads, or stop and ask.
 - **Code style:** `$DELIVERY_ROOT/references/code-standards.md` — pure core,
   effects at the edges, no mutation of inputs or shared state, comments only
   for non-obvious *why*. `code-reviewer` validates your diff before the lead.

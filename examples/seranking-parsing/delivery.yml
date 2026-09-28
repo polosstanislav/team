@@ -49,6 +49,11 @@ repos:
     path: ~/work/lib-parsers-php
     role: parser-engineer
     base: main
+    # integration:               # a new engine's parser often lands as one stream:
+    #   - name: <engine>-parser
+    #     branch: ft/<KEY>-<n>-<engine>-parser   # tickets branch off it and PR into it
+    #     final_pr: ""                           # integration branch -> main, merged last
+    #     release: "version bump + CHANGELOG entry (AGENTS.md)"
     verify:
       - composer test
       - composer psalm
@@ -56,7 +61,9 @@ repos:
     notes: >-
       Released as a versioned composer package (tags v*); consumers need a new
       release before they compile against changes. Fixtures live under
-      tests/_data/<engine>/<year>/<date>-<name>.html.
+      tests/_data/<engine>/<year>/<date>-<name>.html. Copy vendor/ into a
+      worktree (never symlink it): Composer autoload resolves src from
+      vendor's real path. psalm runs as a phar via `composer psalm`.
 
   crawling-and-parsing-api:
     path: ~/work/crawling-and-parsing-api
