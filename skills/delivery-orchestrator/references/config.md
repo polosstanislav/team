@@ -19,6 +19,9 @@ project:
   research:                       # optional: prior investigation docs the planner mines
     - docs/research.md
 
+communication:
+  style: normal                   # normal | tired-cynic; orchestrator↔human chat only (communication.md)
+
 tracker:
   type: local                     # local | linear
   local:
@@ -79,5 +82,8 @@ safety:
   ticket in a stream uses the stream's branch as its base; it moves to Testing
   when merged there; `final_pr` is never proposed for merge until the human
   says the stream is ready.
+- `communication.style` is chosen by the human at setup, never by default
+  substitution: if the key is missing, ask. It never reaches tickets, PRs,
+  commits or agent prompts (`communication.md` → "Scope").
 - Keep secrets out of this file. Credentials live wherever the repo already
   keeps them; the config only names *where* agents may write.

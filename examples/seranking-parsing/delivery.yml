@@ -5,6 +5,9 @@ project:
   key: CORE
   research: []                  # e.g. docs/<engine>-research.md for the planner
 
+communication:
+  style: normal                 # normal | tired-cynic (chat with you only; tickets/PRs stay neutral)
+
 tracker:
   type: linear
   linear:

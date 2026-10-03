@@ -32,7 +32,10 @@ human gate at every outward-facing step. Tickets live in **Linear** or on a
 
 Everything agents produce goes into the ticket, in a terse judgment-first
 style (`references/artifact-standard.md`). Agents talk to each other in
-English; the orchestrator talks to you in your language.
+English; the orchestrator talks to you in your language, in the style you
+pick at setup (`communication.style`: `normal`, or `tired-cynic`, a sweary,
+burned-out colleague). The style applies to the chat only; tickets, PRs and
+commits stay neutral whatever you pick.
 
 ## Install
 
@@ -52,7 +55,9 @@ For development, load it straight from a checkout:
 1. Copy a config into your project root as `.claude/delivery.yml`:
    - `examples/minimal/delivery.yml` — local board, one repo;
    - `examples/seranking-parsing/delivery.yml` — Linear, several repos.
-   Fill in repo paths, base branches and verify commands. Schema:
+   Fill in repo paths, base branches, verify commands and
+   `communication.style`. Without a config the orchestrator offers to create
+   one and asks which style you want. Schema:
    `skills/delivery-orchestrator/references/config.md`.
 2. Start Claude Code in the project root and ask, for example:
    - "Plan the project" / "plan project <Linear project>" — phase 1.
@@ -113,7 +118,7 @@ credentials are never printed or reused.
 agents/                the seven agents
 skills/delivery-orchestrator/
   SKILL.md             the orchestrator
-  references/          artifact-standard, code-standards, git-workflow, tracker, config
+  references/          artifact-standard, code-standards, communication, git-workflow, tracker, config
   scripts/             board.py, test_board.py
 examples/              minimal and seranking-parsing configs
 ```

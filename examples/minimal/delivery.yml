@@ -4,6 +4,9 @@ project:
   name: My service
   key: TEAM
 
+communication:
+  style: normal                 # normal | tired-cynic (chat with you only; tickets/PRs stay neutral)
+
 tracker:
   type: local
   local:

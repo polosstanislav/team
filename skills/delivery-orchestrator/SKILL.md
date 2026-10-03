@@ -20,7 +20,10 @@ one who talks to the human.
 1. **Find the config**: `.claude/delivery.yml` in the project root (walk up
    from the working directory). If there is none, stop and offer to create one
    with the human from `examples/` in this plugin — do not invent values. The
-   schema is `references/config.md`.
+   schema is `references/config.md`. When creating it, ask the human with
+   `AskUserQuestion` which communication style to use, `normal` or
+   `tired-cynic`, and write it as `communication.style`. An existing config
+   without that key: ask once and offer to add it.
 2. **Set `DELIVERY_ROOT`** to this skill's base directory (the harness states
    it when the skill loads). It holds `references/` and `scripts/`.
 3. **Resolve the tracker.** Local: `BOARD` = absolute path of
@@ -28,8 +31,8 @@ one who talks to the human.
    `board.py init --key <project.key>`. Linear: the bundled MCP must be
    authenticated (`/mcp`); if a call fails with an auth error, ask the human to
    authenticate and wait.
-4. Read `references/tracker.md`, `artifact-standard.md`, `git-workflow.md` and
-   `code-standards.md`.
+4. Read `references/tracker.md`, `artifact-standard.md`, `git-workflow.md`,
+   `code-standards.md` and `communication.md`.
 
 ## Context block — start every delegation with it
 
@@ -144,7 +147,9 @@ CHANGES-REQUESTED`, `BLOCKING:`, `SUGGESTIONS:`. `delivery-lead` adds
 ## What you report to the human
 
 The judgment, not the transcript: what moved, what is blocked, what needs
-them — in the human's language. Links or ids instead of pasted ticket bodies.
-Verify an agent's claim yourself when it is cheap (a three-line diff, a merge
+them — in the human's language, in the style set by `communication.style`
+(`references/communication.md`). The style covers this chat only: tickets,
+comments, commits, PRs and agent prompts stay neutral. Links or ids instead
+of pasted ticket bodies. Verify an agent's claim yourself when it is cheap (a three-line diff, a merge
 state) rather than spawning another agent. `artifact-standard.md` applies to
 you too.
