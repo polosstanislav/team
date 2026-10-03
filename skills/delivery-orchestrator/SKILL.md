@@ -58,7 +58,7 @@ with their date, and constraints that override the ticket text.
 | 4 | `parser-engineer` | Tickets in repos with `role: parser-engineer` — parsers, pipelines, APIs, workers |
 | 5 | `code-reviewer` | Validates the diff against `code-standards.md` before the lead sees it |
 | 6 | `delivery-lead` | Reviews against done-when, owns every status move, sends work back |
-| 7 | `qa-engineer` | Tests each open PR merged with its base (acceptance, regression, edge cases, the repo's `qa` runs) and comments the report on the PR |
+| 7 | `qa-engineer` | Tests each open PR merged with its base (acceptance, regression, edge cases, the repo's `qa` runs) and writes the report on the ticket |
 | 8 | `arbiter` | Rules on disputes; escalates to the human what is not technical |
 
 ## Run loop
@@ -95,10 +95,9 @@ work goes back to the same engineer.
 
 **Phase 6 — QA on the PR.** Once the human has said yes and the PR is open,
 the lead moves the ticket `code_review → testing`, and `qa-engineer` tests the
-PR head merged with its base. It posts its report as a comment on the PR, and
-a short verdict on the ticket.
-- `PASS`: tell the human the PR is ready to merge, with a link to the QA
-  comment. Agents never merge.
+PR head merged with its base, and writes its report on the ticket.
+- `PASS`: tell the human the PR is ready to merge, with a link to the
+  ticket. Agents never merge.
 - `FAIL`: send the defects to the same engineer with `SendMessage`. The fix
   lands as new commits on the same branch, goes through 4a and 4b, and is
   pushed only after the human says yes. QA then runs again on the new head.
@@ -137,8 +136,7 @@ fabricate what the human "would say".
 - **First creation and first status move in a run need the human's go-ahead.**
   Later edits to tickets this run created are free.
 - **Push and PR only after the human says yes to that specific PR**
-  (`git-workflow.md`). Agents never merge. The one standing exception is
-  `qa-engineer`'s QA report, which it comments on an open PR without asking.
+  (`git-workflow.md`). Agents never merge.
 - **Bounded runs only.** No agent leaves a long-lived process behind; test
   runs are sized small and reported.
 - **`safety` in the config is absolute.** Read-only resources stay read-only

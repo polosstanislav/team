@@ -89,7 +89,8 @@ safety:
   substitution: if the key is missing, ask. It never reaches tickets, PRs,
   commits or agent prompts (`communication.md` → "Scope").
 - `qa` is optional. Without it, QA on a PR is acceptance + `verify` +
-  regression, all on the PR head merged with its base. Commands here that are visible or costly still need the
+  regression, all on the PR head merged with its base. Commands here that
+  are visible or costly still need the
   human's yes per run, and `safety` bounds them like any other run.
 - Keep secrets out of this file. Credentials live wherever the repo already
   keeps them; the config only names *where* agents may write.

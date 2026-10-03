@@ -50,8 +50,7 @@ the human's call.
 |---|---|
 | Stage plan for a project | Project document (Linear) / `PROJECT.md` (local) |
 | Ticket content — scope, contract, done-when | Ticket description |
-| Progress, WORK-REPORT, review verdict, test evidence | Ticket comment |
-| QA report | PR comment (full), ticket comment (verdict + link) |
+| Progress, WORK-REPORT, review verdict, QA report, test evidence | Ticket comment |
 | Arbiter ruling | Ticket comment prefixed `RULING:` |
 
 Nothing of substance lives only in chat, a scratch file, or an agent's return

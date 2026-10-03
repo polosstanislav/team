@@ -38,7 +38,7 @@ ticket's worktree. Read `$DELIVERY_ROOT/references/artifact-standard.md`,
 - `code_review → testing` happens when the ticket's PR is open, because QA
   runs on the PR. `testing → done` happens after the merge, and only when
   the merged tree equals a PR head that `qa-engineer` **passed**. Find that
-  head in its PR comment. A merge carrying commits QA never tested does not
+  head in its QA report on the ticket. A merge carrying commits QA never tested does not
   move, whoever asks. The one exception is a human decision recorded on the
   ticket to skip QA, e.g. for a decision or investigation ticket with no
   code. A QA FAIL is not yours to overrule. A dispute about it goes to

@@ -91,10 +91,9 @@ trailer present, nothing unrelated in the diff.
   the ticket — what the diff cannot show, in artifact-standard voice. If the
   repo has a PR template or a PR-creation skill, use it.
 - Target `repos.<name>.base`. Agents never merge.
-- Once the PR is open, `qa-engineer` tests it and comments its report on the
-  PR. That comment is the only thing an agent writes on a PR without a
-  per-action yes. Agents never approve, request changes or merge. Any
-  commit pushed after a QA pass needs a new QA round before merge.
+- Once the PR is open, `qa-engineer` tests it and writes its report on the
+  ticket. Agents never comment on, approve or merge a PR. Any commit pushed
+  after a QA pass needs a new QA round before merge.
 - After the human merges: verify the merged content (see above), remove the
   worktree, delete the local and remote ticket branch, and link the merge
   commit on the ticket.

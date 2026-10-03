@@ -17,7 +17,7 @@ and settle disputes — with a human gate at every outward-facing step. Tickets 
  planner    ticket-      crawler-/    code-reviewer       delivery-lead          │
             author       parser-          │  changes             │  rejected     ▼
                          engineer ◄───────┴──requested───────────┴──── FAIL ── 6 QA on the PR
-                                                                               qa-engineer, comments on the PR
+                                                                               qa-engineer, report on the ticket
                                    two rounds lost ──► 5 arbiter               │ PASS
                                    ruling | question for you                   ▼
                                                                       you merge ──► done
@@ -31,7 +31,7 @@ and settle disputes — with a human gate at every outward-facing step. Tickets 
 | `parser-engineer` | Implements tickets in `role: parser-engineer` repos (parsers, pipelines, APIs) | its worktree, ticket comments |
 | `code-reviewer` | Checks *how* the diff is written: functional style, comments, tests, repo conventions | ticket comments |
 | `delivery-lead` | Checks *whether* done-when is met, verifies claims itself; the only one who moves status | ticket status, comments |
-| `qa-engineer` | Tests each open PR merged with its base: acceptance, regression, edge cases, the repo's `qa` runs. Posts the report on the PR; its PASS is what you merge on | PR comments, ticket comments |
+| `qa-engineer` | Tests each open PR merged with its base: acceptance, regression, edge cases, the repo's `qa` runs. Writes the report on the ticket; its PASS is what you merge on | ticket comments |
 | `arbiter` | Rules on disputes from the evidence, or turns them into a question for you | ticket comments |
 
 Everything agents produce goes into the ticket, in a terse judgment-first
@@ -94,8 +94,7 @@ python3 board.py --board .board show TEAM-5
 - Creating tickets and the first status move in a run.
 - Any question an agent cannot settle from the ticket, code, config and
   conventions — agents stop and ask instead of guessing.
-- Every push and every PR. Agents never merge. The one standing exception:
-  `qa-engineer` posts its QA report as a comment on an open PR without asking.
+- Every push and every PR. Agents never merge or comment on PRs.
 - Live runs that are visible or costly (e.g. headful browsers), as the repo's
   notes describe.
 
