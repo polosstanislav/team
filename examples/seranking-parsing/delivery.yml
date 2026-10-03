@@ -38,6 +38,8 @@ repos:
       - npm run build
       - npx eslint "src/**/*.ts"
       - npm test
+    qa:                         # live, headful: qa-engineer asks before each run
+      - "bounded live run via the local-crawler-config skill: ~10 tasks per market, workers stopped after"
     notes: >-
       Read AGENTS.md. Repo skills: local-crawler-config (local config from the
       real helm values, push test tasks, bounded workers) and open-engine-page

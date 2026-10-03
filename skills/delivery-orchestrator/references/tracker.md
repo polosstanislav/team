@@ -14,7 +14,8 @@ Only `delivery-lead` changes status. Engineers never move their own ticket.
 The lead moves exactly one step per accepted review:
 `development → code_review → testing → done`. Start-of-work (`todo →
 development`) is a lead move too, done when the orchestrator says the human
-approved taking the ticket.
+approved taking the ticket. `testing → done` also needs a `qa-engineer` PASS
+recorded on the ticket.
 
 ## Operations
 
@@ -48,7 +49,7 @@ the human's call.
 |---|---|
 | Stage plan for a project | Project document (Linear) / `PROJECT.md` (local) |
 | Ticket content — scope, contract, done-when | Ticket description |
-| Progress, WORK-REPORT, review verdict, test evidence | Ticket comment |
+| Progress, WORK-REPORT, review verdict, QA report, test evidence | Ticket comment |
 | Arbiter ruling | Ticket comment prefixed `RULING:` |
 
 Nothing of substance lives only in chat, a scratch file, or an agent's return

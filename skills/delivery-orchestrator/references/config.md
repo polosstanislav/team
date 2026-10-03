@@ -59,6 +59,8 @@ repos:
     verify:                       # run in this order before any report; paste real output
       - npm ci
       - npm test
+    qa:                           # optional: smoke / live runs qa-engineer adds on the merged ref
+      - npm run smoke
     notes: >-                     # repo quirks agents must know
       Read AGENTS.md first.
 
@@ -85,5 +87,8 @@ safety:
 - `communication.style` is chosen by the human at setup, never by default
   substitution: if the key is missing, ask. It never reaches tickets, PRs,
   commits or agent prompts (`communication.md` → "Scope").
+- `qa` is optional. Without it, QA is acceptance + `verify` + regression on
+  the merged ref. Commands here that are visible or costly still need the
+  human's yes per run, and `safety` bounds them like any other run.
 - Keep secrets out of this file. Credentials live wherever the repo already
   keeps them; the config only names *where* agents may write.

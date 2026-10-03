@@ -9,7 +9,7 @@
     {
       "name": "team",
       "source": "./",
-      "description": "Seven-agent delivery loop over Linear or a local folder board — planner, ticket author, crawler and parser engineers, code reviewer, delivery lead, arbiter.",
+      "description": "Eight-agent delivery loop over Linear or a local folder board — planner, ticket author, crawler and parser engineers, code reviewer, delivery lead, QA engineer, arbiter.",
       "category": "productivity",
       "author": {
         "name": "polosstanislav"

@@ -1,7 +1,7 @@
 {
   "name": "team",
-  "version": "0.3.0",
-  "description": "Seven-agent delivery loop: plan a project, write tickets, build and test in per-ticket worktrees, validate code, review against done-when, and arbitrate disputes. Works with Linear or a local folder-based board.",
+  "version": "0.4.0",
+  "description": "Eight-agent delivery loop: plan a project, write tickets, build and test in per-ticket worktrees, validate code, review against done-when, QA the merged change, and arbitrate disputes. Works with Linear or a local folder-based board.",
   "author": {
     "name": "polosstanislav"
   },
@@ -11,6 +11,7 @@
     "orchestration",
     "linear",
     "kanban",
-    "code-review"
+    "code-review",
+    "qa"
   ]
 }

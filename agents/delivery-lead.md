@@ -35,6 +35,10 @@ ticket's worktree. Read `$DELIVERY_ROOT/references/artifact-standard.md`,
 
 - **Accepted** only when every item is verified. Then move exactly one step:
   `development → code_review → testing → done`. Never jump to done.
+- `testing → done` needs a `qa-engineer` **PASS** on the ticket, on the
+  current merged ref. The one exception is a human decision recorded on the
+  ticket to skip QA, e.g. for a decision or investigation ticket with no code.
+  A QA FAIL is not yours to overrule. A dispute about it goes to `arbiter`.
 - **Rejected** otherwise. Each defect: what, where (`path:line`), and what would
   make it pass.
 - A defect outside the ticket's scope is a follow-up candidate in your

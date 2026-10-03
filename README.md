@@ -1,8 +1,9 @@
 # team
 
-A Claude Code plugin that runs a seven-agent delivery loop: plan a project,
+A Claude Code plugin that runs an eight-agent delivery loop: plan a project,
 write the tickets, build and test each ticket in its own git worktree,
-validate the code, review it against done-when, and settle disputes — with a
+validate the code, review it against done-when, QA the merged change, and
+settle disputes — with a
 human gate at every outward-facing step. Tickets live in **Linear** or on a
 **local folder board** in your project.
 
@@ -14,10 +15,11 @@ human gate at every outward-facing step. Tickets live in **Linear** or on a
      ┌───────┴────────────── delivery-orchestrator (skill) ─────────────────┐
      │                                                                      │
  1 plan ──► 2 author ──► 3 build ──► 4a code review ──► 4b lead review ──► PR (on your yes)
- planner    ticket-      crawler-/    code-reviewer       delivery-lead
-            author       parser-          │  changes             │  rejected
-                         engineer ◄───────┴──requested───────────┘
-                                   two rounds lost ──► 5 arbiter ──► ruling | question for you
+ planner    ticket-      crawler-/    code-reviewer       delivery-lead        │ you merge
+            author       parser-          │  changes             │  rejected   ▼
+                         engineer ◄───────┴──requested───────────┘         6 QA ── qa-engineer
+                                   two rounds lost ──► 5 arbiter              │ PASS → done
+                                   ruling | question for you                  │ FAIL → fix ticket
 ```
 
 | Agent | Does | Can write |
@@ -28,6 +30,7 @@ human gate at every outward-facing step. Tickets live in **Linear** or on a
 | `parser-engineer` | Implements tickets in `role: parser-engineer` repos (parsers, pipelines, APIs) | its worktree, ticket comments |
 | `code-reviewer` | Checks *how* the diff is written: functional style, comments, tests, repo conventions | ticket comments |
 | `delivery-lead` | Checks *whether* done-when is met, verifies claims itself; the only one who moves status | ticket status, comments |
+| `qa-engineer` | Tests the merged change: acceptance, regression, edge cases, the repo's `qa` runs; its PASS gates `testing → done` | ticket comments |
 | `arbiter` | Rules on disputes from the evidence, or turns them into a question for you | ticket comments |
 
 Everything agents produce goes into the ticket, in a terse judgment-first
@@ -115,7 +118,7 @@ credentials are never printed or reused.
 ```
 .claude-plugin/        plugin.json, marketplace.json
 .mcp.json              bundled Linear MCP
-agents/                the seven agents
+agents/                the eight agents
 skills/delivery-orchestrator/
   SKILL.md             the orchestrator
   references/          artifact-standard, code-standards, communication, git-workflow, tracker, config
