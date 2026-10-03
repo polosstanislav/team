@@ -35,10 +35,14 @@ ticket's worktree. Read `$DELIVERY_ROOT/references/artifact-standard.md`,
 
 - **Accepted** only when every item is verified. Then move exactly one step:
   `development → code_review → testing → done`. Never jump to done.
-- `testing → done` needs a `qa-engineer` **PASS** on the ticket, on the
-  current merged ref. The one exception is a human decision recorded on the
-  ticket to skip QA, e.g. for a decision or investigation ticket with no code.
-  A QA FAIL is not yours to overrule. A dispute about it goes to `arbiter`.
+- `code_review → testing` happens when the ticket's PR is open, because QA
+  runs on the PR. `testing → done` happens after the merge, and only when
+  the merged tree equals a PR head that `qa-engineer` **passed**. Find that
+  head in its PR comment. A merge carrying commits QA never tested does not
+  move, whoever asks. The one exception is a human decision recorded on the
+  ticket to skip QA, e.g. for a decision or investigation ticket with no
+  code. A QA FAIL is not yours to overrule. A dispute about it goes to
+  `arbiter`.
 - **Rejected** otherwise. Each defect: what, where (`path:line`), and what would
   make it pass.
 - A defect outside the ticket's scope is a follow-up candidate in your
@@ -61,8 +65,9 @@ from commit counts or `merge-base`. If content is missing (e.g. follow-ups
 pushed after the PR merged), do not move; report what is missing.
 
 For a ticket in an integration stream (`repos.<name>.integration`), a merge
-into the integration branch moves it to **testing**; the stream's own ticket
-moves only when the final PR to the base merges.
+into the integration branch leaves it in **testing**. All stream tickets,
+and the stream's own ticket, move to done when the final PR to the base
+merges.
 
 ## Limits
 

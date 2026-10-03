@@ -3,8 +3,8 @@ name: delivery-orchestrator
 description: >-
   Runs the eight-agent delivery loop for a project tracked in Linear or on a
   local folder board — plan the stages, write the tickets, build and test in
-  per-ticket worktrees, validate the code, review against done-when, QA the
-  merged change, move tickets, and arbitrate disputes. Use when asked to plan a project's
+  per-ticket worktrees, validate the code, review against done-when, QA each
+  PR before merge, move tickets, and arbitrate disputes. Use when asked to plan a project's
   development and integration cycle, fill tickets with real scope, take tickets
   into work, drive a ticket to Done with agents, or run the delivery loop.
 ---
@@ -58,7 +58,7 @@ with their date, and constraints that override the ticket text.
 | 4 | `parser-engineer` | Tickets in repos with `role: parser-engineer` — parsers, pipelines, APIs, workers |
 | 5 | `code-reviewer` | Validates the diff against `code-standards.md` before the lead sees it |
 | 6 | `delivery-lead` | Reviews against done-when, owns every status move, sends work back |
-| 7 | `qa-engineer` | Tests the merged change: acceptance, regression, edge cases, the repo's `qa` runs. Read-only |
+| 7 | `qa-engineer` | Tests each open PR merged with its base (acceptance, regression, edge cases, the repo's `qa` runs) and comments the report on the PR |
 | 8 | `arbiter` | Rules on disputes; escalates to the human what is not technical |
 
 ## Run loop
@@ -93,20 +93,29 @@ work goes back to the same engineer.
 `arbiter` with both sides' artifacts. It returns `RULING` (apply it) or
 `NEEDS-USER-DECISION`.
 
-**After a merge.** Verify the merge (`gh pr view` or the host's equivalent)
-and its content by tree comparison (squash breaks ancestry), have the lead
-move the ticket to testing, remove the worktree, delete the local and remote
-branch. Before pushing follow-ups to an open PR, check it is still open
-(`git-workflow.md`).
+**Phase 6 — QA on the PR.** Once the human has said yes and the PR is open,
+the lead moves the ticket `code_review → testing`, and `qa-engineer` tests the
+PR head merged with its base. It posts its report as a comment on the PR, and
+a short verdict on the ticket.
+- `PASS`: tell the human the PR is ready to merge, with a link to the QA
+  comment. Agents never merge.
+- `FAIL`: send the defects to the same engineer with `SendMessage`. The fix
+  lands as new commits on the same branch, goes through 4a and 4b, and is
+  pushed only after the human says yes. QA then runs again on the new head.
+  Two FAILs on the same ticket go to phase 5.
+- A QA run that is visible or costly needs the human's yes first. The agent
+  returns `NEEDS-USER-DECISION`.
 
-**Phase 6 — QA.** `qa-engineer` on each ticket in testing, against the merged
-ref: the base branch, or for an integration-stream ticket the integration
-branch. A `PASS` lets the lead move `testing → done`. An integration-stream
-ticket waits in testing until the stream's final PR merges. Then QA runs once
-more on the base, for the whole stream. A `FAIL` leaves the ticket in testing.
-Show the human the defects and propose a fix ticket (`fix/` branch); the fix
-goes through phases 3-6 like any other ticket. A QA run that is visible or
-costly needs the human's yes first (the agent returns `NEEDS-USER-DECISION`).
+A QA verdict covers only the head SHA it tested. Any new commit on the PR
+needs a new QA round before merge.
+
+**After a merge.** Verify the merge (`gh pr view` or the host's equivalent).
+Verify its content by tree comparison, because a squash breaks ancestry.
+Then have the lead move the ticket `testing → done`. The lead checks that
+the merged tree equals a head QA passed. An integration-stream ticket stays
+in testing until the stream's final PR merges. Remove the worktree, and
+delete the local and the remote branch. Before pushing follow-ups to an
+open PR, check it is still open (`git-workflow.md`).
 
 ## Escalation: the only path to the human
 
@@ -128,7 +137,8 @@ fabricate what the human "would say".
 - **First creation and first status move in a run need the human's go-ahead.**
   Later edits to tickets this run created are free.
 - **Push and PR only after the human says yes to that specific PR**
-  (`git-workflow.md`). Agents never merge.
+  (`git-workflow.md`). Agents never merge. The one standing exception is
+  `qa-engineer`'s QA report, which it comments on an open PR without asking.
 - **Bounded runs only.** No agent leaves a long-lived process behind; test
   runs are sized small and reported.
 - **`safety` in the config is absolute.** Read-only resources stay read-only

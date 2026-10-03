@@ -59,7 +59,7 @@ repos:
     verify:                       # run in this order before any report; paste real output
       - npm ci
       - npm test
-    qa:                           # optional: smoke / live runs qa-engineer adds on the merged ref
+    qa:                           # optional: smoke / live runs qa-engineer adds when testing a PR
       - npm run smoke
     notes: >-                     # repo quirks agents must know
       Read AGENTS.md first.
@@ -81,14 +81,15 @@ safety:
   done-when item as unverified — never invents a replacement.
 - `safety` is enforced by every agent and overrides ticket text.
 - `integration` streams follow `git-workflow.md` → "Integration branches": a
-  ticket in a stream uses the stream's branch as its base; it moves to Testing
-  when merged there; `final_pr` is never proposed for merge until the human
+  ticket in a stream uses the stream's branch as its base. It is in Testing
+  from PR open (QA runs on the PR) and moves to Done when the final PR
+  merges; `final_pr` is never proposed for merge until the human
   says the stream is ready.
 - `communication.style` is chosen by the human at setup, never by default
   substitution: if the key is missing, ask. It never reaches tickets, PRs,
   commits or agent prompts (`communication.md` → "Scope").
-- `qa` is optional. Without it, QA is acceptance + `verify` + regression on
-  the merged ref. Commands here that are visible or costly still need the
+- `qa` is optional. Without it, QA on a PR is acceptance + `verify` +
+  regression, all on the PR head merged with its base. Commands here that are visible or costly still need the
   human's yes per run, and `safety` bounds them like any other run.
 - Keep secrets out of this file. Credentials live wherever the repo already
   keeps them; the config only names *where* agents may write.

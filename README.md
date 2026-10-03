@@ -2,9 +2,8 @@
 
 A Claude Code plugin that runs an eight-agent delivery loop: plan a project,
 write the tickets, build and test each ticket in its own git worktree,
-validate the code, review it against done-when, QA the merged change, and
-settle disputes — with a
-human gate at every outward-facing step. Tickets live in **Linear** or on a
+validate the code, review it against done-when, QA each PR before it merges,
+and settle disputes — with a human gate at every outward-facing step. Tickets live in **Linear** or on a
 **local folder board** in your project.
 
 ## The loop
@@ -15,11 +14,13 @@ human gate at every outward-facing step. Tickets live in **Linear** or on a
      ┌───────┴────────────── delivery-orchestrator (skill) ─────────────────┐
      │                                                                      │
  1 plan ──► 2 author ──► 3 build ──► 4a code review ──► 4b lead review ──► PR (on your yes)
- planner    ticket-      crawler-/    code-reviewer       delivery-lead        │ you merge
-            author       parser-          │  changes             │  rejected   ▼
-                         engineer ◄───────┴──requested───────────┘         6 QA ── qa-engineer
-                                   two rounds lost ──► 5 arbiter              │ PASS → done
-                                   ruling | question for you                  │ FAIL → fix ticket
+ planner    ticket-      crawler-/    code-reviewer       delivery-lead          │
+            author       parser-          │  changes             │  rejected     ▼
+                         engineer ◄───────┴──requested───────────┴──── FAIL ── 6 QA on the PR
+                                                                               qa-engineer, comments on the PR
+                                   two rounds lost ──► 5 arbiter               │ PASS
+                                   ruling | question for you                   ▼
+                                                                      you merge ──► done
 ```
 
 | Agent | Does | Can write |
@@ -30,7 +31,7 @@ human gate at every outward-facing step. Tickets live in **Linear** or on a
 | `parser-engineer` | Implements tickets in `role: parser-engineer` repos (parsers, pipelines, APIs) | its worktree, ticket comments |
 | `code-reviewer` | Checks *how* the diff is written: functional style, comments, tests, repo conventions | ticket comments |
 | `delivery-lead` | Checks *whether* done-when is met, verifies claims itself; the only one who moves status | ticket status, comments |
-| `qa-engineer` | Tests the merged change: acceptance, regression, edge cases, the repo's `qa` runs; its PASS gates `testing → done` | ticket comments |
+| `qa-engineer` | Tests each open PR merged with its base: acceptance, regression, edge cases, the repo's `qa` runs. Posts the report on the PR; its PASS is what you merge on | PR comments, ticket comments |
 | `arbiter` | Rules on disputes from the evidence, or turns them into a question for you | ticket comments |
 
 Everything agents produce goes into the ticket, in a terse judgment-first
@@ -93,7 +94,8 @@ python3 board.py --board .board show TEAM-5
 - Creating tickets and the first status move in a run.
 - Any question an agent cannot settle from the ticket, code, config and
   conventions — agents stop and ask instead of guessing.
-- Every push and every PR. Agents never merge.
+- Every push and every PR. Agents never merge. The one standing exception:
+  `qa-engineer` posts its QA report as a comment on an open PR without asking.
 - Live runs that are visible or costly (e.g. headful browsers), as the repo's
   notes describe.
 
