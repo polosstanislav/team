@@ -3,8 +3,9 @@ name: delivery-orchestrator
 description: >-
   Runs the eight-agent delivery loop for a project tracked in Linear or on a
   local folder board — plan the stages, write the tickets, build and test in
-  per-ticket worktrees, validate the code, review against done-when, QA each
-  PR before merge, move tickets, and arbitrate disputes. Use when asked to plan a project's
+  per-ticket worktrees, validate the code, review against done-when, QA every
+  merged change (including production verification from logs, metrics and
+  dumps), move tickets, and arbitrate disputes. Use when asked to plan a project's
   development and integration cycle, fill tickets with real scope, take tickets
   into work, drive a ticket to Done with agents, or run the delivery loop.
 ---
@@ -32,7 +33,9 @@ one who talks to the human.
    authenticated (`/mcp`); if a call fails with an auth error, ask the human to
    authenticate and wait.
 4. Read `references/tracker.md`, `artifact-standard.md`, `git-workflow.md`,
-   `code-standards.md` and `communication.md`.
+   `code-standards.md`, `communication.md` and `observability.md`.
+5. **Sweep merges.** Run the post-merge step below for any ticket in
+   code_review whose PR has merged since the last run.
 
 ## Context block — start every delegation with it
 
@@ -58,7 +61,7 @@ with their date, and constraints that override the ticket text.
 | 4 | `parser-engineer` | Tickets in repos with `role: parser-engineer` — parsers, pipelines, APIs, workers |
 | 5 | `code-reviewer` | Validates the diff against `code-standards.md` before the lead sees it |
 | 6 | `delivery-lead` | Reviews against done-when, owns every status move, sends work back |
-| 7 | `qa-engineer` | Tests each open PR merged with its base (acceptance, regression, edge cases, the repo's `qa` runs) and writes the report on the ticket |
+| 7 | `qa-engineer` | Takes each merged ticket in testing. Tests the merged code and verifies production fixes from logs, metrics and dumps. Closes the ticket or sends it back with a fix description |
 | 8 | `arbiter` | Rules on disputes; escalates to the human what is not technical |
 
 ## Run loop
@@ -93,28 +96,34 @@ work goes back to the same engineer.
 `arbiter` with both sides' artifacts. It returns `RULING` (apply it) or
 `NEEDS-USER-DECISION`.
 
-**Phase 6 — QA on the PR.** Once the human has said yes and the PR is open,
-the lead moves the ticket `code_review → testing`, and `qa-engineer` tests the
-PR head merged with its base, and writes its report on the ticket.
-- `PASS`: tell the human the PR is ready to merge, with a link to the
-  ticket. Agents never merge.
-- `FAIL`: send the defects to the same engineer with `SendMessage`. The fix
-  lands as new commits on the same branch, goes through 4a and 4b, and is
-  pushed only after the human says yes. QA then runs again on the new head.
-  Two FAILs on the same ticket go to phase 5.
+**PR.** When the lead has accepted the work, ask the human about that
+specific PR. Push and open it only on an explicit yes (`git-workflow.md`).
+The human merges.
+
+**After a merge, automatically.** At the start of every run, and whenever the
+human says something merged, check the open PRs of tickets in code_review
+(`gh pr view` or the host's equivalent). For each merged PR, with no further
+go-ahead:
+1. The lead verifies the merge and its content by tree comparison (a squash
+   breaks ancestry), then moves the ticket `code_review → testing`.
+2. Remove the worktree, and delete the local and the remote branch.
+3. Start phase 6 for the ticket right away.
+
+**Phase 6 — QA.** `qa-engineer` takes the ticket in testing and tests the
+merged code. When the change touches production behaviour, it also verifies
+the change in production from logs, metrics and dumps
+(`references/observability.md`). Then it moves the ticket itself:
+- `PASS` → done. Tell the human it is closed.
+- `FAIL` → development, with a fix description on the ticket. Create a new
+  `fix/` branch off the current base and send the description to the
+  engineer. The fix runs phases 3-6 again.
+- `WAITING`: the fix is merged but not deployed. The ticket stays in testing.
+  Run QA again when the human says it is deployed, or when the start-of-run
+  sweep finds it deployed per `repos.<name>.deploy`.
 - A QA run that is visible or costly needs the human's yes first. The agent
   returns `NEEDS-USER-DECISION`.
 
-A QA verdict covers only the head SHA it tested. Any new commit on the PR
-needs a new QA round before merge.
-
-**After a merge.** Verify the merge (`gh pr view` or the host's equivalent).
-Verify its content by tree comparison, because a squash breaks ancestry.
-Then have the lead move the ticket `testing → done`. The lead checks that
-the merged tree equals a head QA passed. An integration-stream ticket stays
-in testing until the stream's final PR merges. Remove the worktree, and
-delete the local and the remote branch. Before pushing follow-ups to an
-open PR, check it is still open (`git-workflow.md`).
+Two FAILs on the same ticket go to phase 5.
 
 ## Escalation: the only path to the human
 
@@ -134,7 +143,8 @@ fabricate what the human "would say".
   conventions do not settle goes to the human — from any agent, or from you
   before delegating. This overrides "pick the most reasonable option".
 - **First creation and first status move in a run need the human's go-ahead.**
-  Later edits to tickets this run created are free.
+  Later edits to tickets this run created are free. Standing exceptions: the
+  post-merge move `code_review → testing`, and QA's moves out of testing.
 - **Push and PR only after the human says yes to that specific PR**
   (`git-workflow.md`). Agents never merge.
 - **Bounded runs only.** No agent leaves a long-lived process behind; test

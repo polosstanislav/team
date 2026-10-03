@@ -59,10 +59,28 @@ repos:
     verify:                       # run in this order before any report; paste real output
       - npm ci
       - npm test
-    qa:                           # optional: smoke / live runs qa-engineer adds when testing a PR
+    qa:                           # optional: smoke / live runs qa-engineer adds on the merged code
       - npm run smoke
+    deploy: >-                    # optional: how QA tells a merge reached production
+      image tag in the deploy repo's values file >= the merge commit; else ask the human
     notes: >-                     # repo quirks agents must know
       Read AGENTS.md first.
+
+observability:                    # optional: read-only sources for production verification (observability.md)
+  logs:
+    type: victorialogs
+    url: https://<victorialogs host>  # LogsQL endpoint: <url>/select/logsql/query
+    base_query: 'env:"production"'    # prepended to every query
+    via_grafana: false            # true: reach logs through a Grafana datasource instead
+  metrics:
+    grafana_dashboards:           # dashboards / panels QA compares before vs after deploy
+      - <dashboard title or uid>
+  artifacts:
+    - name: parsed dumps
+      uri: s3://<bucket>/<prefix>/   # date / id layout described in notes
+      profile: ""                 # aws cli profile; empty = default chain
+      notes: >-
+        Key layout and how to find the dump of one task.
 
 safety:
   read_only:                      # never written by any agent
@@ -88,9 +106,13 @@ safety:
 - `communication.style` is chosen by the human at setup, never by default
   substitution: if the key is missing, ask. It never reaches tickets, PRs,
   commits or agent prompts (`communication.md` → "Scope").
-- `qa` is optional. Without it, QA on a PR is acceptance + `verify` +
-  regression, all on the PR head merged with its base. Commands here that
-  are visible or costly still need the
+- `qa` is optional. Without it, QA is acceptance + `verify` + regression on
+  the merged code. Commands here that are visible or costly still need the
   human's yes per run, and `safety` bounds them like any other run.
+- `deploy` and `observability` are needed only for production verification.
+  Without them, QA asks the human whether the change is deployed, and marks
+  the production part unverified. It never searches for hosts or
+  credentials. Every `observability` source is read-only, whatever
+  `safety` says.
 - Keep secrets out of this file. Credentials live wherever the repo already
   keeps them; the config only names *where* agents may write.

@@ -10,13 +10,16 @@ Canonical keys, used everywhere: `backlog`, `todo`, `development`,
 `code_review`, `testing`, `done`. Linear state ids come from
 `tracker.linear.states.<key>`; local folders are `1-backlog` … `6-done`.
 
-Only `delivery-lead` changes status. Engineers never move their own ticket.
-The lead moves exactly one step per accepted review:
-`development → code_review → testing → done`. Start-of-work (`todo →
-development`) is a lead move too, done when the orchestrator says the human
-approved taking the ticket. `code_review → testing` happens when the PR
-opens, because QA runs on the PR. `testing → done` happens after the merge,
-and only if `qa-engineer` passed the merged head.
+Two agents change status, each on its own moves:
+
+- `delivery-lead`: `todo → development` at start of work (when the
+  orchestrator says the human approved it), `development → code_review` on an
+  accepted review, and `code_review → testing` once it has verified that the
+  PR merged.
+- `qa-engineer`: `testing → done` on a QA pass, and `testing → development`
+  on a fail, with a fix description.
+
+Engineers never move their own ticket.
 
 ## Operations
 
@@ -33,7 +36,7 @@ may be working from a worktree elsewhere.
 | Update description | `save_issue` (id, description) | `describe <id> --body-file f` |
 | Set a field (branch, repo, owner, blocked_by) | description text / links | `set <id> <field> <value>` |
 | Comment | `save_comment` | `comment <id> --author <role> --body-file f` |
-| Move status (lead only) | `save_issue` (id, state = `states.<key>`) | `move <id> <key>` |
+| Move status (lead / QA, see above) | `save_issue` (id, state = `states.<key>`) | `move <id> <key>` |
 | Project brief / plan document | `get_project`, `get_document`, `save_document` | read / write `$BOARD/PROJECT.md` |
 
 For local writes, put the text in a temp file first (`--body-file`) — never

@@ -56,10 +56,9 @@ A repo may declare an integration branch for a body of work
 - Branch off the integration branch's **remote** tip and PR into it — never
   into the default branch. A local copy of it may be stale; always use
   `origin/`.
-- A ticket is in **Testing** from the moment its PR opens, and QA runs on
-  that PR. A merge into the integration branch leaves it in Testing. The
-  ticket moves to Done when the stream's final PR merges into the default
-  branch.
+- A ticket moves to **Testing** when its PR merges into the integration
+  branch, and QA tests it on the integration tip. The stream's own ticket
+  moves when the final PR to the default branch merges.
 - The integration branch reaches the default branch as **one final squash
   PR**, merged only when the whole stream is ready. Never propose merging it
   earlier. Release chores owed at that squash (version bump, CHANGELOG) are
@@ -91,9 +90,8 @@ trailer present, nothing unrelated in the diff.
   the ticket — what the diff cannot show, in artifact-standard voice. If the
   repo has a PR template or a PR-creation skill, use it.
 - Target `repos.<name>.base`. Agents never merge.
-- Once the PR is open, `qa-engineer` tests it and writes its report on the
-  ticket. Agents never comment on, approve or merge a PR. Any commit pushed
-  after a QA pass needs a new QA round before merge.
+- Agents never comment on, approve or merge a PR. After the merge, the
+  ticket goes to testing automatically and `qa-engineer` takes it.
 - After the human merges: verify the merged content (see above), remove the
   worktree, delete the local and remote ticket branch, and link the merge
   commit on the ticket.

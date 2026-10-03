@@ -2,25 +2,25 @@
 
 A Claude Code plugin that runs an eight-agent delivery loop: plan a project,
 write the tickets, build and test each ticket in its own git worktree,
-validate the code, review it against done-when, QA each PR before it merges,
-and settle disputes — with a human gate at every outward-facing step. Tickets live in **Linear** or on a
+validate the code, review it against done-when, QA every merged change
+(production fixes included), and settle disputes — with a human gate at every outward-facing step. Tickets live in **Linear** or on a
 **local folder board** in your project.
 
 ## The loop
 
 ```
-            you ── approve plan / tickets / pushes, answer questions
+            you ── approve plan / tickets / pushes, answer questions, merge
              │
      ┌───────┴────────────── delivery-orchestrator (skill) ─────────────────┐
      │                                                                      │
  1 plan ──► 2 author ──► 3 build ──► 4a code review ──► 4b lead review ──► PR (on your yes)
- planner    ticket-      crawler-/    code-reviewer       delivery-lead          │
-            author       parser-          │  changes             │  rejected     ▼
-                         engineer ◄───────┴──requested───────────┴──── FAIL ── 6 QA on the PR
-                                                                               qa-engineer, report on the ticket
-                                   two rounds lost ──► 5 arbiter               │ PASS
-                                   ruling | question for you                   ▼
-                                                                      you merge ──► done
+ planner    ticket-      crawler-/    code-reviewer       delivery-lead          │ you merge
+            author       parser-          │  changes             │  rejected     ▼  auto: → testing
+                         engineer ◄───────┴──requested───────────┘          6 QA ── qa-engineer
+                            ▲                                       merged code + prod: logs,
+                            │                                       Grafana, S3 dumps
+                            └──────── FAIL → development + fix description ─┤
+                                   two rounds lost ──► 5 arbiter             │ PASS → done
 ```
 
 | Agent | Does | Can write |
@@ -30,8 +30,8 @@ and settle disputes — with a human gate at every outward-facing step. Tickets 
 | `crawler-engineer` | Implements tickets in `role: crawler-engineer` repos (browser automation, crawlers) | its worktree, ticket comments |
 | `parser-engineer` | Implements tickets in `role: parser-engineer` repos (parsers, pipelines, APIs) | its worktree, ticket comments |
 | `code-reviewer` | Checks *how* the diff is written: functional style, comments, tests, repo conventions | ticket comments |
-| `delivery-lead` | Checks *whether* done-when is met, verifies claims itself; the only one who moves status | ticket status, comments |
-| `qa-engineer` | Tests each open PR merged with its base: acceptance, regression, edge cases, the repo's `qa` runs. Writes the report on the ticket; its PASS is what you merge on | ticket comments |
+| `delivery-lead` | Checks *whether* done-when is met, verifies claims itself; moves status up to testing | ticket status, comments |
+| `qa-engineer` | Takes every merged ticket: tests the merged code, verifies production fixes from VictoriaLogs, Grafana and S3 dumps (read-only); closes the ticket or sends it back with a fix description | ticket status (out of testing), comments |
 | `arbiter` | Rules on disputes from the evidence, or turns them into a question for you | ticket comments |
 
 Everything agents produce goes into the ticket, in a terse judgment-first
@@ -122,7 +122,7 @@ credentials are never printed or reused.
 agents/                the eight agents
 skills/delivery-orchestrator/
   SKILL.md             the orchestrator
-  references/          artifact-standard, code-standards, communication, git-workflow, tracker, config
+  references/          artifact-standard, code-standards, communication, git-workflow, observability, tracker, config
   scripts/             board.py, test_board.py
 examples/              minimal and seranking-parsing configs
 ```

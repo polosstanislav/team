@@ -38,6 +38,9 @@ repos:
       - npm run build
       - npx eslint "src/**/*.ts"
       - npm test
+    deploy: >-
+      new image rolled out: the image tag in the deploy repo's helm values
+      includes the merge commit; confirm in VictoriaLogs by pod / a new log line
     qa:                         # live, headful: qa-engineer asks before each run
       - "bounded live run via the local-crawler-config skill: ~10 tasks per market, workers stopped after"
     notes: >-
@@ -106,6 +109,24 @@ repos:
     notes: >-
       Read AGENTS.md and CLAUDE.md (PSR-12, comments only for complex business
       logic).
+
+observability:                  # read-only; fill hosts locally — see the crawler repo's local-crawler-config skill, §4
+  logs:
+    type: victorialogs
+    url: https://<crawler VictoriaLogs host>
+    base_query: 'env:"production"'
+  metrics:
+    grafana_dashboards:
+      - <crawler dashboard>
+      - <parsing dashboard>
+  artifacts:
+    - name: crawler dumps (raw HTML)
+      uri: s3://<dump bucket>/<prefix>/
+      notes: >-
+        The dump key embeds the task uid; a task's log lines carry it, so
+        logs -> uid -> dump. Customer queries inside: report keys and counts only.
+    - name: parsed results / intermediate dumps
+      uri: s3://<results bucket>/<prefix>/
 
 safety:
   read_only:
