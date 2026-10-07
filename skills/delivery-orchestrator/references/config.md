@@ -44,6 +44,9 @@ git:
   worktree: "../{repo}-{ticket}"  # relative to the repo path
   commit_trailer: ""              # e.g. "Co-Authored-By: ..."; empty = your harness's attribution line
   pr_title: "{ticket} {title}"
+  pr_opener:                      # the AI-agent bot account every PR is opened as (git-workflow.md)
+    login: ""                     # its GitHub login, as listed in the AI-agent allowlist
+    token_env: ""                 # name of the env var holding its token — never the token itself
   merge: "humans merge"           # agents never merge
 
 repos:
@@ -114,5 +117,8 @@ safety:
   the production part unverified. It never searches for hosts or
   credentials. Every `observability` source is read-only, whatever
   `safety` says.
+- `git.pr_opener` is required before any PR is opened: every PR is opened
+  as that bot so it counts as AI-driven. If `login` or `token_env` is empty,
+  or the variable is unset, ask — never fall back to the human's account.
 - Keep secrets out of this file. Credentials live wherever the repo already
   keeps them; the config only names *where* agents may write.

@@ -85,6 +85,15 @@ Before pushing: branch clean, rebased or cleanly mergeable onto the current
 `origin/<base>` (check with `git merge-tree --write-tree origin/<base> HEAD`),
 trailer present, nothing unrelated in the diff.
 
+- **Every PR is opened by the bot in `git.pr_opener`, never by the human's
+  account.** A PR opened by that bot counts as AI_DRIVEN: the bot is in the
+  `engineering.ai_agent_user` allowlist, and every PR from this loop must be
+  AI_DRIVEN. Open it with the bot's token only for this call
+  (`GH_TOKEN="$<token_env>" gh pr create …`; the host's MCP connector acts as
+  the human, so do not use it here), then check
+  `gh pr view <n> --json author` shows `pr_opener.login`. This holds when the
+  human pushed the branch themselves. If the bot cannot open it, stop and
+  ask; do not open it any other way.
 - Title: `git.pr_title`.
 - Description: why, the decisions and their alternatives, evidence, link to
   the ticket — what the diff cannot show, in artifact-standard voice. If the

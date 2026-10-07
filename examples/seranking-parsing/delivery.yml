@@ -28,6 +28,9 @@ git:
   worktree: "../{repo}-{ticket}"
   commit_trailer: ""
   pr_title: "{ticket} {title}"
+  pr_opener:                    # Claude bot from engineering.ai_agent_user; PRs it opens are AI_DRIVEN
+    login: ""
+    token_env: ""
 
 repos:
   unified-headless-crawler:

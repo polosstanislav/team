@@ -147,6 +147,8 @@ fabricate what the human "would say".
   post-merge move `code_review → testing`, and QA's moves out of testing.
 - **Push and PR only after the human says yes to that specific PR**
   (`git-workflow.md`). Agents never merge.
+- **Every PR is opened as the `git.pr_opener` bot**, so it counts as
+  AI_DRIVEN. No bot configured or no token → ask; never open it as the human.
 - **Bounded runs only.** No agent leaves a long-lived process behind; test
   runs are sized small and reported.
 - **`safety` in the config is absolute.** Read-only resources stay read-only
